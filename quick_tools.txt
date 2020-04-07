@@ -1,0 +1,118 @@
+#Access to Movie Class 
+
+movie = tmdb.Movies()
+
+can include with id
+movie = tmdb.Movies(603)
+
+
+
+ |      Returns:
+ |          A dict respresentation of the JSON returned from the API.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes defined here:
+ |  
+ |  BASE_PATH = 'movie'
+ |  
+ |  URLS = {'account_states': '/{id}/account_states', 'alternative_titles'...
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from tmdbsimple.base.TMDB:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes inherited from tmdbsimple.base.TMDB:
+ |  
+ |  headers = {'Accept': 'application/json', 'Connection': 'close', 'Conte..
+
+#########################################################################################################################################################
+
+
+#Access to Search 
+search = tmdb.Search() 
+
+response = movie.search("Movie")
+# Print out search results 
+
+for s in search.results:
+    print(s['title']) # call dictonary keys to print value 
+
+
+#########################################################################################################################################################
+
+
+
+###  Checks to see if a file is empty 
+import os 
+
+if (os.stat(f1name).st_size == 0)
+            print 'File is empty!'
+
+
+#########################################################################################################################################################
+
+
+
+#### Get movie information from API 
+
+import tmdbsimple as tmdb
+tmdb.API_KEY = 'bf2db7d8063307bdcc241c3919c45564'
+
+path = open('intended.txt','r')
+for line in path: 
+    num = line.rstrip()
+    movie = tmdb.Movies(num)
+    response = movie.info()
+    print(movie.backdrop_path)
+
+
+
+
+#########################################################################################################################################################
+
+/// HOW TO USE TKINTER BASIC STEPS
+
+import tkinter as tk
+
+
+class Body(tk.Frame):
+    def __init__(self,parent):
+        tk.Frame.__init__(self,parent)
+        self.parent = parent 
+        self.initialize_user_interface()
+
+    def initialize_user_interface(self):
+        self.parent.geometry("400x600")
+        self.parent.title("Login")
+
+
+        self.entry=tk.Entry(self.parent)
+        self.entry.pack()
+
+
+        self.button =tk.Button(self.parent, text = "Enter", command = self.PassCheck)
+        self.button.pack()
+
+        
+        self.label =tk.Label(self.parent, text = "Please choose a password")
+        self.label.pack()
+
+    def PassCheck(self):
+        password = self.entry.get()
+        
+        self.label.config(text=password)
+        
+      
+
+
+if __name__ == '__main__':
+
+   root = tk.Tk()
+   run = Body(root)
+   root.mainloop()
