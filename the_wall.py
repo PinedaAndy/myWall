@@ -1,6 +1,7 @@
 import tmdbsimple as tmdb
 import os 
 
+# fix this
 tmdb.API_KEY = 'bf2db7d8063307bdcc241c3919c45564'
 
 """
@@ -152,7 +153,7 @@ class MyCollection:
 
 
 
-C  
+ 
 
 
 ####################                  
