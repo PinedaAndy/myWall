@@ -1,5 +1,7 @@
 import tkinter as tk
 import tkinter.font as tkFont
+import tkinter.frame as tkFrame
+
 
 
 class Loading_Screen(tk.Frame):
@@ -21,21 +23,22 @@ class Loading_Screen(tk.Frame):
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
-        frame = self.frames[page_name]
+        frame = page_name
         frame.tkraise()     
      
 
     def loading_screen(self):
-    
+        ls = Loading_Screen(tk.Frame)
+
 
         self.parent.geometry("600x600")
         self.parent.title("Login")
         
         ## Creates the Login Caption 
-        self.label = tk.Label(self.parent, text = "My Wall", font = ("Marker Felt", 80), fg = 'white', bg = 'black' , height = 5, )
+        self.label = tk.Label(self.parent, text = "My Wall", font = ("Marker Felt", 80), fg = 'white' , height = 5, )
         self.label.pack()
 
-        self.button =tk.Button(self.parent, text = "Enter" ,height = 5 ,width = 10, command = Home_Screen.main()) 
+        self.button =tk.Button(self.parent, text = "Enter" ,height = 5 ,width = 10, command = ls.show_frame('Home_Screen'))
         self.button.pack()
 
     
@@ -52,17 +55,16 @@ class Home_Screen(tk.Frame):
         self.parent.title("Home")
         
 
-        
-        
-        
-        
+    
       
 
 
 if __name__ == '__main__':
 
+
+   # Run app 
+  
    root = tk.Tk()
-   root.configure(background = 'black')
    run = Loading_Screen(root)
    root.mainloop()
 

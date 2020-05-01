@@ -4,10 +4,8 @@ import os
 tmdb.API_KEY = 'bf2db7d8063307bdcc241c3919c45564'
 
 """
-
 Searches the The Movie Database for a movie with the titled entered by the user
 or similar 
-
 """
 class Search:
     
@@ -20,12 +18,13 @@ class Search:
         search = tmdb.Search()
         response = search.movie(query = name)
 
-        #Showing search results and letting you select a movie
+        #Showing search results and letting you select a movie or tv show 
         #used a dictonary to store title as key and ID as value 
         
         search_hold = {}
         
         count = 1 
+        
         for s in search.results:
             title = s["title"]
             title_id = s["id"]
@@ -34,7 +33,8 @@ class Search:
             search_hold[count].append(title)
             search_hold[count].append(title_id)
             count += 1
-            
+
+      
           
         #returns search results in a dictonary 
         return search_hold
@@ -59,10 +59,8 @@ class Search:
 
 
 """
-
 Users personal collection of saved movies that they intend to watch 
 works by saving the movies designated Id number given by TMDB
-
 """
 
 class MyCollection:
@@ -78,7 +76,6 @@ class MyCollection:
         """
         Opens your list of movies you intend to watch. Movies are saved by ID numbers 
         to a text file named intended.txt 
-
         If movie id number is already in the intended.txt file then a print statement 
         will print letting you know that the selected movie is already in your list 
         else it'll add the new id number to your intended to watch list
@@ -152,7 +149,7 @@ class MyCollection:
 
 
 
-C  
+
 
 
 ####################                  
@@ -194,7 +191,6 @@ intended,watched = c.my_list()
 """
 Prints out user movie list by Titles
 opens the intended file and assigns each id to its designated movie title
-
 """
 
 path = open('intended.txt','r')
@@ -203,5 +199,3 @@ for line in path:
     movie = tmdb.Movies(num)
     response = movie.info()
     print(movie.title)
-
-
