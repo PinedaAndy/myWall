@@ -1,6 +1,7 @@
 import tmdbsimple as tmdb
 import os 
 
+# fix this
 tmdb.API_KEY = 'bf2db7d8063307bdcc241c3919c45564'
 
 """
@@ -148,11 +149,7 @@ class MyCollection:
         return intended_list,watched_list
 
 
-
-
-
-
-####################                  
+               
     
         
         
@@ -198,4 +195,4 @@ for line in path:
     num = line.rstrip()
     movie = tmdb.Movies(num)
     response = movie.info()
-    print(movie.title)
+    #print(movie.title)
