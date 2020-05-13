@@ -48,7 +48,6 @@ class Wall:
         
         # sort movies by whether they were watched or not
         for movie in movies:
-            print(movie)
             movie_id, title, genre, release_date, overview, poster_image, trailer_link = [movie['movie_id'], movie['title'], movie['genre'], movie['release_date'], movie['overview'], movie['poster_image'], movie['trailer_link']]
 
             if movie['watched'] == 1:
@@ -79,7 +78,7 @@ class Wall:
 
         movies = self.watched.append(self.intended)
         df = pd.DataFrame(data = movies)
-        df.to_csv(columns = columns)
+        df.to_csv()
 
             
 
@@ -102,9 +101,9 @@ def search_tmdb(my_query):
         date = parsed_data['release_date']
         year = date[0:3]
         genre_data = parsed_data['genres']
-        print(genre_data[0])
-
-        movie_id, title, genre, release_date, overview = [parsed_data['id'], parsed_data['title'], genre_data['name'], year, parsed_data['overview']]
+        if genre_data != []:
+            genre_name = genre_data[0]
+        movie_id, title, genre, release_date, overview = [parsed_data['id'], parsed_data['title'], genre_name['name'], year, parsed_data['overview']]
 
         # make video link
         link = ""
@@ -130,25 +129,34 @@ def search_tmdb(my_query):
 
 def get_recommendations(movie_id):
     data = requests.get(url = f"https://api.themoviedb.org/3/movie/{movie_id}/recommendations?api_key={tmdb.API_KEY}&append_to_response=videos,images")
-    parsed_data = data.json()
-
+    paged_data = data.json()
     recommendations = []
+    
+    parsed_data = []
+    for page in paged_data['results']:
+        parsed_data.append(page)
+
+
 
     for movies in parsed_data:
-        movie_id, title, genre, release_date, overview = [parsed_data['id'], parsed_data['title'], parsed_data['genres'][0]['name'], parsed_data['release_date'][:3], parsed_data['overview']]
+        date = movies['release_date']
+        year = date[0:3]
+        genre_data = movies['genre_ids']
+        if genre_data != []:
+            genre_name = genre_data[0]
+        
+        movie_id, title, genre, release_date, overview = [movies['id'], movies['title'], genre_name, year, movies['overview']]
         link = ""
         # make video link
-        if parsed_data['videos'] is not None:
-            # get video data
-            video_data = requests.get(url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={tmdb.API_KEY}")
-            parsed_video_data = video_data.json()
-
-            for result in parsed_video_data['results']:
-                # filter for exclusively trailers and teasers; only supports youtube videos
-                if (result['type'] in ['Trailer', 'Teaser']) and (result['site'] == 'Youtube'):
-                    key = result['key']
-                    link = f"https://www.youtube.com/watch?v={key}"
-                    break
+        # get video data
+        video_data = requests.get(url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={tmdb.API_KEY}")
+        parsed_video_data = video_data.json()
+        for result in parsed_video_data['results']:
+            # filter for exclusively trailers and teasers; only supports youtube videos
+            if (result['type'] in ['Trailer', 'Teaser']) and (result['site'] == 'Youtube'):
+                key = result['key']
+                link = f"https://www.youtube.com/watch?v={key}"
+                break
 
         recommendations.append(Movie(movie_id, title, genre, release_date, overview, trailer_link = link))
     return recommendations
@@ -156,7 +164,7 @@ def get_recommendations(movie_id):
 
 if __name__ == "__main__":
     wall = Wall()
-    wall.intended += search_tmdb("The Great Escape")[0]
+    wall.intended.append(search_tmdb("The Great Escape")[0])
     wall.recompile_list()
-    print(str(get_recommendations(1092)))
+    print(str(get_recommendations(1092)[0].title))      
     time.sleep(30)
