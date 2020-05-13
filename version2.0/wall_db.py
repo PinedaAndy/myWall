@@ -1,6 +1,7 @@
 import os
 import requests
 import time
+import csv
 import json
 import pandas as pd
 import tkinter as tk
@@ -10,10 +11,11 @@ tmdb.API_KEY = 'bf2db7d8063307bdcc241c3919c45564'
 
 class Movie:
     """ The data associated with a movie """
-    def __init__(self, id, title, genre, release_date, overview, poster_image="", trailer_link=""):
-        self.id = id
+    def __init__(self, movie_id, title, genre, release_date, overview, poster_image="", trailer_link=""):
+        self.movie_id = movie_id
         self.title = title
         self.overview = overview
+        self.genre = genre
         self.release_date = release_date
         self.poster_image = poster_image
         self.trailer_link = trailer_link
@@ -35,28 +37,34 @@ class Wall:
         self.watched = []
         self.intended = []
 
-        # headers of movies.csv: id, watched, title, genre, , release_date, overview, poster_path, trailer_link
+        # headers of movies.csv: movie_id, watched, title, genre, , release_date, overview, poster_path, trailer_link
         # load data of movies already saved
-        movies = pd.read_csv("./movies.csv")
-
+        #movies = pd.read_csv("./movies.csv") #columns = ['movie_id', 'title', 'genre', 'release_date', 'overview', 'poster_image', 'trailer_link'])
+        movies = []
+        with open("./movies.csv", mode = 'r') as infile:
+            reader = csv.DictReader(infile)
+            for row in reader:
+                movies.append(row)
+        
         # sort movies by whether they were watched or not
         for movie in movies:
-            id, title, genre, release_date, overview, poster_image, trailer_link = [movie['id'], movie['title'], movie['genre'], movie['release_date'], movie['overview'], movie['poster_image'], movie['trailer_link']]
+            print(movie)
+            movie_id, title, genre, release_date, overview, poster_image, trailer_link = [movie['movie_id'], movie['title'], movie['genre'], movie['release_date'], movie['overview'], movie['poster_image'], movie['trailer_link']]
 
             if movie['watched'] == 1:
-                self.watched.append(Movie(id, title, genre, release_date, overview, poster_image, trailer_link))
+                self.watched.append(Movie(movie_id, title, genre, release_date, overview, poster_image, trailer_link))
             elif movie['watched'] == 0:
-                self.intended.append(Movie(id, title, genre, release_date, overview, poster_image, trailer_link))
+                self.intended.append(Movie(movie_id, title, genre, release_date, overview, poster_image, trailer_link))
 
 
     #def get_recommendations(self, movie_id):
 
 
-    def add_to_watched(self, movie_id):
-        """ Adds movie to watched list and removes it from intended list using id of movie"""
+    def add_to_watched(self, new_movie_id):
+        """ Adds movie to watched list and removes it from intended list using movie_id of movie"""
         i = 0
         while i < len(self.intended):
-            if self.intended[i].id == movie_id:
+            if self.intended[i].movie_id == new_movie_id:
                 index = i
                 break
             else:
@@ -64,10 +72,10 @@ class Wall:
         self.watched.append( self.intended.pop(index) )
     
     def add_to_list(self, movie):
-        movie = search_tmdb(movie.id)
+        movie = search_tmdb(movie.movie_id)
 
     def recompile_list(self):
-        columns = ['id', 'title', 'genre', 'release_date', 'overview', 'poster_image', 'trailer_link']
+        columns = ['movie_id', 'title', 'genre', 'release_date', 'overview', 'poster_image', 'trailer_link']
 
         movies = self.watched.append(self.intended)
         df = pd.DataFrame(data = movies)
@@ -91,7 +99,12 @@ def search_tmdb(my_query):
         time.sleep(1)
 
         # sort out desired metadata
-        id, title, genre, release_date, overview = [parsed_data['id'], parsed_data['title'], parsed_data['genres'][0]['name'], parsed_data['release_date'][:3], parsed_data['overview']]
+        date = parsed_data['release_date']
+        year = date[0:3]
+        genre_data = parsed_data['genres']
+        print(genre_data[0])
+
+        movie_id, title, genre, release_date, overview = [parsed_data['id'], parsed_data['title'], genre_data['name'], year, parsed_data['overview']]
 
         # make video link
         link = ""
@@ -109,7 +122,7 @@ def search_tmdb(my_query):
             
         
         
-        results_list.append(Movie(id, title, genre, release_date, overview, trailer_link = link))
+        results_list.append(Movie(movie_id, title, genre, release_date, overview, trailer_link = link))
         time.sleep(1)
     return results_list
 
@@ -122,7 +135,7 @@ def get_recommendations(movie_id):
     recommendations = []
 
     for movies in parsed_data:
-        id, title, genre, release_date, overview = [parsed_data['id'], parsed_data['title'], parsed_data['genres'][0]['name'], parsed_data['release_date'][:3], parsed_data['overview']]
+        movie_id, title, genre, release_date, overview = [parsed_data['id'], parsed_data['title'], parsed_data['genres'][0]['name'], parsed_data['release_date'][:3], parsed_data['overview']]
         link = ""
         # make video link
         if parsed_data['videos'] is not None:
@@ -137,13 +150,13 @@ def get_recommendations(movie_id):
                     link = f"https://www.youtube.com/watch?v={key}"
                     break
 
-        recommendations.append(Movie(id, title, genre, release_date, overview, trailer_link = link))
+        recommendations.append(Movie(movie_id, title, genre, release_date, overview, trailer_link = link))
     return recommendations
 
 
 if __name__ == "__main__":
     wall = Wall()
-    wall.intended = search_tmdb("The Third Man")[0]
+    wall.intended += search_tmdb("The Great Escape")[0]
     wall.recompile_list()
     print(str(get_recommendations(1092)))
     time.sleep(30)

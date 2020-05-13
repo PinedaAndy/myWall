@@ -163,7 +163,7 @@ class Screens():
         user_search = '' #what the user is searching in list
 
 
-        path  = open('/Users/Professional/Desktop/my_wall/intended.txt','r')
+        path  = open('../intended.txt','r')
         image_path = 'https://image.tmdb.org/t/p/original/' #image path to add to jpg of poster link to display poster image for movie id 
 
         # Default Size, stays the same 
