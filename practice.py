@@ -15,5 +15,4 @@ titles = database['title'].unique()
 
 #database.to_csv('movies.csv', mode='a', header=False, index = False) #saves to movies csv
 
-for line in titles:
-    print(line)
+print(database[database['title_id']== 671].index.values)

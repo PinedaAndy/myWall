@@ -51,5 +51,71 @@ def search_movie_name(name):
     return search_hold
     
 
+
+def get_similar(movie_id):
+
+    search = tmdb.Movies(movie_id)
+    similar = search.similar_movies()
+
+    try:
+        id_numbers = []
+
+        i = 0 
+        while i <= len(similar['results']):
+
+            id_num = similar['results'][i]['id']
+            id_numbers.append(id_num)
+
+            print(id_num)
+            i += 1 
+            
+    except:
+        pass 
+        
+    return id_numbers
+
+
+
+
+
+def get_movie_info(movie_id):
+
+    search = tmdb.Movies(movie_id)
+    similar = search.info()
+
+    
+    #gets the basic movie information 
+    title_id = similar['id']
+    title = similar['title']
+    poster_path = similar['poster_path']
+    overview = similar['overview']
+    release_date = similar['release_date']
+
+
+    #Gets the trailer link 
+    movie = tmdb.Movies(movie_id)
+    video_details = movie.videos()
+
+    youtube = 'https://www.youtube.com/watch?v='
+
+    try:
+
+        key = video_details['results'][0]['key'] #unique youtube key for video
+        youtube_key = youtube + key #creates the link 
+
+    except:
+        youtube_key = 'NaN' 
+
+
+    
+    return title_id,title,release_date,poster_path,overview,youtube_key
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
-    pass 
+    print(get_movie_info(674))
