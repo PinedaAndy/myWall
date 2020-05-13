@@ -24,10 +24,11 @@ class home():
         
         self.intended_list = self.database['title_id']
         self.movies_csv = 'movies.csv'
+        self.history_csv = 'history.csv'
         
         #holds load count 
         self.load_count = 0
-        self.main_image_url =  'http://image.tmdb.org/t/p/w185//'
+        self.main_image_url =  'http://image.tmdb.org/t/p/w185///'
 
         """ Creates the main window""" 
 
@@ -74,6 +75,8 @@ class home():
         self.root.mainloop()
 
     
+
+
     def load_a_recommendation(self):
 
         # Searches your movie id's and finds similar movies 
@@ -92,18 +95,12 @@ class home():
 
         
         #current movie 
+      
         movie_num = self.rec_id_nums[0][self.load_count]
         title_id,title,release_date,poster_path,overview,youtube_key = pa.get_movie_info(movie_num)
-        
+            
         self.find_frame(title_id,title,release_date,poster_path,overview,youtube_key)
-
-
-      
-
-
-
-
-
+        self.find_screen
 
 
 
@@ -154,19 +151,23 @@ class home():
 
         #loads poster onto canvas by retrieving the imaage from the the database 
 
-        image_url = self.main_image_url + poster_path
+        try:
+            image_url = self.main_image_url + poster_path
 
-        data = urllib.request.urlopen(image_url)
-        raw_data = data.read()
-        data.close()
+            data = urllib.request.urlopen(image_url)
+            raw_data = data.read()
+            data.close()
 
-        im = Image.open(BytesIO(raw_data))
-        image = ImageTk.PhotoImage(im)
+            im = Image.open(BytesIO(raw_data))
+            image = ImageTk.PhotoImage(im)
 
 
-        self.poster_image = tk.Label(self.poster_frame, image = image )
-        self.poster_image.pack(fill ='both', expand = True)
+            self.poster_image = tk.Label(self.poster_frame, image = image )
+            self.poster_image.pack(fill ='both', expand = True)
 
+        except:
+            self.no_image = tk.Label(self.poster_frame, text = "NO IMAGE")
+            self.no_image.pack(fill ='both', expand = True)
 
 
 
@@ -192,14 +193,14 @@ class home():
         add_watch_list.place(x=122 , y=433)
 
         #Watched button for movies 
-        already_watched_button = tk.Button(self.dummy_frame, text = 'Watched', height =2, width = 10)
+        already_watched_button = tk.Button(self.dummy_frame, text = 'Watched', height =2, width = 10, command = lambda: self.add_movie_to_seen(title_id,title,release_date,poster_path,overview,youtube_key))
         already_watched_button.place(x=222 , y=433)
 
 
 
         self.find_screen.mainloop()
 
-    
+ 
 
     def open_trailer_link(self,trailer_path):
         """Opens youtube and players trailer """ 
@@ -224,15 +225,33 @@ class home():
 
         #creates a new one with a new reccomendation 
         movie_num = self.rec_id_nums[0][self.load_count]
-        title_id,title,release_date,poster_path,overview,youtube_key = pa.get_movie_info(movie_num)
+        title_id,title,release_date,poster,overview,youtube_key = pa.get_movie_info(movie_num)
         
-        self.find_frame(title_id,title,release_date,poster_path,overview,youtube_key)
+        self.find_frame(title_id,title,release_date,poster,overview,youtube_key)
+        self.find_screen
 
 
+    def add_movie_to_seen(self,title_id,title,release_date,poster_path,overview,youtube_key):
 
+        self.load_count += 1 
 
+        line = [title_id,title,release_date,poster_path,overview,youtube_key]
+        series = pd.Series(line, index = self.database.columns)
+        self.history_database = self.history_database.append(series, ignore_index=True)
+        self.history_database.to_csv(self.history_csv, mode='a', header=False, index = False)
+        messagebox.showinfo('Success',"Movie successfully added") #message box to display success of movie added
+        
+        #Destroys old screen 
+        self.dummy_frame.destroy()
+        self.dummy_frame = None 
 
-  
+        #creates a new one with a new reccomendation 
+        movie_num = self.rec_id_nums[0][self.load_count]
+        title_id,title,release_date,poster,overview,youtube_key = pa.get_movie_info(movie_num)
+        
+        self.find_frame(title_id,title,release_date,poster,overview,youtube_key)
+        self.find_screen
+ 
     
     def watched_list_frame(self):
 
@@ -296,8 +315,6 @@ class home():
         self.watched_listbox.delete(value)
 
 
-
-
     def watched_movie(self):
 
         """Shows your watch list of movies """
@@ -335,16 +352,11 @@ class home():
             self.watched_movie_listbox.insert('end',name)
 
 
-
         
 
         
 
         watched_movies.mainloop()   
-
-
-
-
 
 
 
