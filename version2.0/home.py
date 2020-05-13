@@ -1,5 +1,5 @@
 import tkinter as tk
-import database as wall_db
+import wall_db as database
 
 
 
